@@ -5,9 +5,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class PatientService {
-  String? userId = "dLKr1teQlsmBOMwQB5tD";
+  static String? userId = "dLKr1teQlsmBOMwQB5tD";
 
-  Future<void> toggleDevice(String device, Bool deviceStatus) async {
+  Future<void> toggleDevice(String device, bool deviceStatus) async {
     FirebaseFirestore db = FirebaseFirestore.instance;
     DocumentReference patientRef = db.collection('rooms').doc(userId);
 
@@ -16,9 +16,9 @@ class PatientService {
     if (device == "tv") patientRef.update({'devices.tv': deviceStatus});
   }
 
-  Future<void> toggleOnlieStatus(Bool isOnline) async {
+  Future<void> toggleOnlieStatus(bool isOnline) async {
     FirebaseFirestore db = FirebaseFirestore.instance;
-    DocumentReference patientRef = db.collection('rooms').doc(userId);
+    DocumentReference patientRef = db.collection('patients').doc(userId);
 
     patientRef.update({'isOnline': isOnline});
   }

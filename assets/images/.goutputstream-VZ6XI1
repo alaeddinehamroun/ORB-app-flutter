@@ -1,0 +1,7 @@
+from PIL import Image
+im = Image.open("orb_afraid.gif")
+i=0
+while im.seek(i) is not None:
+	i=i+1
+	#im.seek(i)
+	im.save("afraid/frame"+str(i)+".png")
