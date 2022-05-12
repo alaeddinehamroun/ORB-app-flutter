@@ -1,12 +1,9 @@
-import 'dart:convert';
-// ignore: avoid_web_libraries_in_flutter
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
-typedef void StreamStateCallback(MediaStream stream);
+typedef StreamStateCallback = void Function(MediaStream stream);
 
 class Signaling {
-
   Map<String, dynamic> configuration = {
     'iceServers': [
       {
@@ -22,13 +19,14 @@ class Signaling {
   RTCPeerConnection? peerConnection;
   MediaStream? localStream;
   MediaStream? remoteStream;
-  String? roomId;
+  String roomId = "dLKr1teQlsmBOMwQB5tD";
   String? currentRoomText;
   StreamStateCallback? onAddRemoteStream;
 
   Future<String> createRoom(RTCVideoRenderer remoteRenderer) async {
     FirebaseFirestore db = FirebaseFirestore.instance;
-    DocumentReference roomRef = db.collection('rooms').doc();
+    DocumentReference roomRef =
+        db.collection('rooms').doc(roomId);
 
     //print('Create PeerConnection with configuration: $configuration');
 
@@ -56,7 +54,6 @@ class Signaling {
     Map<String, dynamic> roomWithOffer = {'offer': offer.toMap()};
 
     await roomRef.set(roomWithOffer);
-    var roomId = roomRef.id;
     //print('New room created with SDK offer. Room ID: $roomId');
     currentRoomText = 'Current room is $roomId - You are the caller!';
     // Created a Room
@@ -83,6 +80,10 @@ class Signaling {
         );
 
         print("Someone tried to connect");
+        // if (peerConnection?.signalingState ==
+        //     signalingStateForString('stable')) {
+        //   await peerConnection?.setRemoteDescription(answer);
+        // }
         await peerConnection?.setRemoteDescription(answer);
       }
     });
@@ -90,7 +91,7 @@ class Signaling {
 
     // Listen for remote Ice candidates below
     roomRef.collection('calleeCandidates').snapshots().listen((snapshot) {
-      snapshot.docChanges.forEach((change) {
+      for (var change in snapshot.docChanges) {
         if (change.type == DocumentChangeType.added) {
           Map<String, dynamic> data = change.doc.data() as Map<String, dynamic>;
           //print('Got new remote ICE candidate: ${jsonEncode(data)}');
@@ -102,16 +103,17 @@ class Signaling {
             ),
           );
         }
-      });
+      }
     });
     // Listen for remote ICE candidates above
 
     return roomId;
   }
 
-  Future<void> joinRoom(String roomId, RTCVideoRenderer remoteVideo) async {
+  Future<void> joinRoom(RTCVideoRenderer remoteVideo) async {
     FirebaseFirestore db = FirebaseFirestore.instance;
-    DocumentReference roomRef = db.collection('rooms').doc(roomId);
+    DocumentReference roomRef =
+        db.collection('rooms').doc("dLKr1teQlsmBOMwQB5tD");
     var roomSnapshot = await roomRef.get();
     //print('Got room ${roomSnapshot.exists}');
 
@@ -166,7 +168,7 @@ class Signaling {
 
       // Listening for remote ICE candidates below
       roomRef.collection('callerCandidates').snapshots().listen((snapshot) {
-        snapshot.docChanges.forEach((document) {
+        for (var document in snapshot.docChanges) {
           var data = document.doc.data() as Map<String, dynamic>;
           //print(data);
           //print('Got new remote ICE candidate: $data');
@@ -177,15 +179,13 @@ class Signaling {
               data['sdpMLineIndex'],
             ),
           );
-        });
+        }
       });
     }
   }
 
   Future<void> openUserMedia(
-    RTCVideoRenderer localVideo,
-    RTCVideoRenderer remoteVideo,
-  ) async {
+      RTCVideoRenderer localVideo, RTCVideoRenderer remoteVideo) async {
     var stream = await navigator.mediaDevices
         .getUserMedia({'video': true, 'audio': true});
 
@@ -206,17 +206,8 @@ class Signaling {
     }
     if (peerConnection != null) peerConnection!.close();
 
-    if (roomId != null) {
-      var db = FirebaseFirestore.instance;
-      var roomRef = db.collection('rooms').doc(roomId);
-      var calleeCandidates = await roomRef.collection('calleeCandidates').get();
-      calleeCandidates.docs.forEach((document) => document.reference.delete());
-
-      var callerCandidates = await roomRef.collection('callerCandidates').get();
-      callerCandidates.docs.forEach((document) => document.reference.delete());
-
-      await roomRef.delete();
-    }
+    var db = FirebaseFirestore.instance;
+    db.collection("rooms").doc(roomId).delete();
 
     localStream!.dispose();
     remoteStream?.dispose();
@@ -224,11 +215,11 @@ class Signaling {
 
   void registerPeerConnectionListeners() {
     peerConnection?.onIceGatheringState = (RTCIceGatheringState state) {
-      print('ICE gathering state changed: $state');
+      //print('ICE gathering state changed: $state');
     };
 
     peerConnection?.onConnectionState = (RTCPeerConnectionState state) {
-      print('Connection state change: $state');
+      //print('Connection state change: $state');
     };
 
     peerConnection?.onSignalingState = (RTCSignalingState state) {
@@ -236,11 +227,11 @@ class Signaling {
     };
 
     peerConnection?.onIceGatheringState = (RTCIceGatheringState state) {
-      print('ICE connection state change: $state');
+      //print('ICE connection state change: $state');
     };
 
     peerConnection?.onAddStream = (MediaStream stream) {
-      print("Add remote stream");
+      //print("Add remote stream");
       onAddRemoteStream?.call(stream);
       remoteStream = stream;
     };
