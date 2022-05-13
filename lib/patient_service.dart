@@ -23,15 +23,20 @@ class PatientService {
     patientRef.update({'isOnline': isOnline});
   }
 
-  Future<void> sendNotification(String notificationType, String notificationText) async {
+  Future<void> sendNotification(
+      String notificationType, String notificationText) async {
     FirebaseFirestore db = FirebaseFirestore.instance;
-    DocumentReference patientRef = db.collection('rooms').doc(userId);
-    if (notificationType == 'uregent') {
-      patientRef.update({'notfications.urgent': notificationText});
-    } else {
-      patientRef.update({'notfications.others': notificationText});
-    }
+    DocumentReference notificationRef =
+        db.collection('patients').doc(userId).collection('notifications').doc();
+    notificationRef.set({
+      'type': notificationType,
+      'text': notificationText,
+      'date': DateTime.now().millisecondsSinceEpoch
+    });
   }
+  // Future<String> getNotification() {
+
+  // }
 
   Future<void> sendFile(String notificationType, String filePath) async {
     final file = File(filePath);

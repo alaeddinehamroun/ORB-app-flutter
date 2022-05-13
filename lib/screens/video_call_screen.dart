@@ -7,14 +7,14 @@ import '../widgets/rounded_button.dart';
 
 class VideoCallScreen extends StatefulWidget {
   static const routName = '/video-call';
-  const VideoCallScreen({Key? key}) : super(key: key);
-
+  VideoCallScreen({Key? key}) : super(key: key);
   @override
   State<VideoCallScreen> createState() => _VideoCallScreenState();
 }
 
 class _VideoCallScreenState extends State<VideoCallScreen> {
   Signaling signaling = Signaling();
+
   final RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   final RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
   String? roomId;
@@ -83,7 +83,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                 iconSrc: "assets/icons/call_end.svg",
                 press: () {
                   signaling.hangUp(_localRenderer);
-                  Navigator.of(context).pushNamed('/');
+                  // Navigator.of(context).pushNamed('/');
                 },
               ),
               RoundedButton(
