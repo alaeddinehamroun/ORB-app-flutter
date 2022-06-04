@@ -5,15 +5,16 @@ import 'package:flutter_video_chat/screens/video_call_screen.dart';
 
 import 'screens/orb_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Firebase.initializeApp();
+  await Firebase.initializeApp();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
-  SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft])
+  SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeRight])
       .then((_) {
     runApp(const MyApp());
   });
 }
+
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -28,11 +29,10 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (ctx) =>OrbScreen(),
-        VideoCallScreen.routName: (ctx) => VideoCallScreen(),
+        '/': (context) => const OrbScreen(),
       },
       onUnknownRoute: (settings) {
-        return MaterialPageRoute(builder: (ctx) => OrbScreen());
+        return MaterialPageRoute(builder: (context) => VideoCallScreen());
       },
     );
   }

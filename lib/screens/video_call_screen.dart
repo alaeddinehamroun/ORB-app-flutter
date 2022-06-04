@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_video_chat/signalling.dart';
+import 'package:flutter_video_chat/services/signalling.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../constants.dart';
@@ -60,8 +60,14 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         extendBodyBehindAppBar: true,
         body: Row(
           children: [
-            Expanded(child: RTCVideoView(_localRenderer, mirror: true)),
-            Expanded(child: RTCVideoView(_remoteRenderer)),
+            Expanded(
+              child: RTCVideoView(_localRenderer, mirror: true),
+              flex: 2,
+            ),
+            Expanded(
+              child: RTCVideoView(_remoteRenderer),
+              flex: 2,
+            ),
           ],
         ),
         bottomNavigationBar: Container(
@@ -83,7 +89,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                 iconSrc: "assets/icons/call_end.svg",
                 press: () {
                   signaling.hangUp(_localRenderer);
-                  // Navigator.of(context).pushNamed('/');
+                  Navigator.pop(context);
                 },
               ),
               RoundedButton(

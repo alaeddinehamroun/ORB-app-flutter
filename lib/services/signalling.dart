@@ -207,7 +207,19 @@ class Signaling {
     if (peerConnection != null) peerConnection!.close();
 
     var db = FirebaseFirestore.instance;
+    db.collection("rooms").doc(roomId).collection("callerCandidates").snapshots().forEach((element) {
+        for (QueryDocumentSnapshot snapshot in element.docs) {
+          snapshot.reference.delete();
+        }
+      });
+
+    db.collection("rooms").doc(roomId).collection("calleeCandidates").snapshots().forEach((element) {
+        for (QueryDocumentSnapshot snapshot in element.docs) {
+          snapshot.reference.delete();
+        }
+      });
     db.collection("rooms").doc(roomId).delete();
+
 
     localStream!.dispose();
     remoteStream?.dispose();
